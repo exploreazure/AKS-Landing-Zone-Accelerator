@@ -11,6 +11,7 @@ param fwapplicationRuleCollections array
 param fwnetworkRuleCollections array
 param fwnatRuleCollections array
 param location string = deployment().location
+param fwsku string
 param availabilityZones array
 
 module rg 'modules/resource-group/rg.bicep' = {
@@ -27,7 +28,7 @@ module vnethub 'modules/vnet/vnet.bicep' = {
   params: {
     location: location
     vnetAddressSpace: {
-        addressPrefixes: hubVNETaddPrefixes
+      addressPrefixes: hubVNETaddPrefixes
     }
     vnetName: vnetHubName
     subnets: hubSubnets
@@ -41,9 +42,26 @@ module publicipfw 'modules/vnet/publicip.bicep' = {
   scope: resourceGroup(rg.name)
   name: 'AZFW-PIP'
   params: {
-    availabilityZones:availabilityZones
+    availabilityZones: availabilityZones
     location: location
     publicipName: 'AZFW-PIP'
+    publicipproperties: {
+      publicIPAllocationMethod: 'Static'
+    }
+    publicipsku: {
+      name: 'Standard'
+      tier: 'Regional'
+    }
+  }
+}
+
+module publicipfwman 'modules/vnet/publicip.bicep' = {
+  scope: resourceGroup(rg.name)
+  name: 'AZFW-PIP-MAN'
+  params: {
+    availabilityZones: availabilityZones
+    location: location
+    publicipName: 'AZFW-PIP-MAN'
     publicipproperties: {
       publicIPAllocationMethod: 'Static'
     }
@@ -59,6 +77,11 @@ resource subnetfw 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' existin
   name: '${vnethub.name}/AzureFirewallSubnet'
 }
 
+resource subnetfwmanagement 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' existing = {
+  scope: resourceGroup(rg.name)
+  name: '${vnethub.name}/AzureFirewallManagementSubnet'
+}
+
 module azfirewall 'modules/vnet/firewall.bicep' = {
   scope: resourceGroup(rg.name)
   name: azfwName
@@ -66,6 +89,7 @@ module azfirewall 'modules/vnet/firewall.bicep' = {
     availabilityZones: availabilityZones
     location: location
     fwname: azfwName
+    fwsku: fwsku
     fwipConfigurations: [
       {
         name: 'AZFW-PIP'
@@ -79,6 +103,17 @@ module azfirewall 'modules/vnet/firewall.bicep' = {
         }
       }
     ]
+    fwmanipConfigurations: {
+      name: 'AZFW-PIP-MAN'
+      properties: {
+        subnet: {
+          id: subnetfwmanagement.id
+        }
+        publicIPAddress: {
+          id: publicipfwman.outputs.publicipId
+        }
+      }
+    }
     fwapplicationRuleCollections: fwapplicationRuleCollections
     fwnatRuleCollections: fwnatRuleCollections
     fwnetworkRuleCollections: fwnetworkRuleCollections

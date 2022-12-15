@@ -40,7 +40,7 @@
       }
     },
     "kubernetesVersion": {
-      "value": "1.22.6"
+      "value": "1.23.12"
     },
     "networkPlugin": {
       "value": "azure"
@@ -64,10 +64,10 @@
       "value": "AppGWSubnet-RT"
     },
     "aksuseraccessprincipalId": {
-      "value": "<service principal id for developers AAD user group>"
+      "value": "13476967-0f6b-4e2b-9d69-411d2c9c1388"
     },
     "aksadminaccessprincipalId": {
-      "value": "<service principal id for admin AAD user group>"
+      "value": "cc11f8b5-8b9b-4123-91f0-0f0a9242fa60"
     },
     "aksIdentityName": {
       "value": "aksIdentity"

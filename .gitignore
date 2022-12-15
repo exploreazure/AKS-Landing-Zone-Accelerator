@@ -53,3 +53,4 @@ override.tf.json
 
 .vscode*
 
+Scenarios/AKS-Secure-Baseline-PrivateCluster/Bicep/03-Network-Hub/parameters-deploy-vm.json

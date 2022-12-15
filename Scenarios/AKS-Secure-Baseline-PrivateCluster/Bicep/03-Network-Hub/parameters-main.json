@@ -41,9 +41,15 @@
           }
         },
         {
+          "name": "AzureFirewallManagementSubnet",
+          "properties": {
+            "addressPrefix": "10.0.3.0/26"
+          }
+        },
+        {
           "name": "vmsubnet",
           "properties": {
-            "addressPrefix": "10.0.3.0/24"
+            "addressPrefix": "10.0.4.0/24"
           }
         }
       ]
@@ -51,7 +57,10 @@
     "azfwName": {
       "value": "AZFW"
     },
-    "rtVMSubnetName":{
+    "fwsku": {
+      "value": "Basic"
+    },
+    "rtVMSubnetName": {
       "value": "vm-subnet-rt"
     },
     "fwapplicationRuleCollections": {
@@ -240,6 +249,47 @@
                 ],
                 "destinationPorts": [
                   "1194"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "VMS-INTERNET-OUT",
+          "properties": {
+            "priority": 210,
+            "action": {
+              "type": "Allow"
+            },
+            "rules": [
+              {
+                "name": "HTTP",
+                "protocols": [
+                  "TCP"
+                ],
+                "sourceAddresses": [
+                  "10.0.4.0/24"
+                ],
+                "destinationAddresses": [
+                  "*"
+                ],
+                "destinationPorts": [
+                  "80"
+                ]
+              },
+              {
+                "name": "HTTPS",
+                "protocols": [
+                  "TCP"
+                ],
+                "sourceAddresses": [
+                  "10.0.4.0/24"
+                ],
+                "destinationAddresses": [
+                  "*"
+                ],
+                "destinationPorts": [
+                  "443"
                 ]
               }
             ]
